@@ -1,39 +1,49 @@
 class Main {
 	static void main(args) {
-		println "Perfect numbers between 1 and 1000"
-		
-		for(n in 1..1000){
-			if(perfect(n) && n > 1){
-				println "${n} is perfect";
-			}
-		}
-
-		println "********************************";
 		def br = new BufferedReader(new InputStreamReader(System.in));
-		print "\nLower limit : ";
-		def a = br.readLine().toInteger();
-		print "\nUpper limit : ";
-		def b = br.readLine().toInteger();
+		print "\nGross Salary : ";
+		def g = br.readLine().toDouble();
+		print "\nSavings : ";
+		def s = br.readLine().toDouble();
 
-		for(n in a..b){
-			if(perfect(n) && n > 1){
-				println "${n} is perfect";
-			}
-		}
+		def income = taxCalculator(g, s);
+
+		println "Taxable amount is ${income.taxable} and tax is ${income.tax}";
 	}
 	
-	static boolean perfect(int n){
-		def sum = 1;
+	static Income taxCalculator(double g, double s){
+
+		assert g > s;
+
+		def noTax = Math.min(s, 100000);
+		def taxable = g - noTax;
 		
-		for(int i = 2; i*i <= n; i++){
-			if(n%i == 0){
-				if(i * i == n)
-					sum += i;
-				else
-					sum += i + (n/i);
-			}
+		double tax = 0;
+
+		switch(taxable) {
+			case { it > 100000 }:
+				tax += (taxable - 100000) * 0.1;
+				if(taxable <= 200000)
+					break;
+			case { it > 200000 }:
+				tax += (taxable - 200000) * 0.2;
+				if(taxable <= 500000)
+					break;
+			case { it > 500000 }:
+				tax += (taxable - 500000) * 0.3;
 		}
-	
-		return n == sum;
+
+		return new Income(g, s, taxable, tax);
+	}
+}
+
+class Income {
+	double gross, savings, taxable, tax;
+
+	Income(gross, savings, taxable, tax){
+		this.gross = gross;
+		this.savings = savings;
+		this.taxable = taxable;
+		this.tax = tax;
 	}
 }
